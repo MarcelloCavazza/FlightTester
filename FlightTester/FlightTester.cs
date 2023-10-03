@@ -1,39 +1,52 @@
 using Domain.FlightTest;
 using FluentAssertions;
+using System.Collections.Generic;
 
 namespace FlightTester
 {
     public class FlightTester
     {
+        private const int flightMaxSeats = 3;
+
         [Fact]
-        public void Booking3FlightsShouldBe0Remaining()
+        public void SucessfulBooking()
         {
-            Flight fl = new Flight(3);
-            fl.Book(1, "Marcello");
-            fl.Book(2, "Marcello1");
-            fl.Book(3, "Marcello2");
+            Dictionary<int, string> dataToTest = new()
+            {
+                {1, "Marcello"},
+                {2, "Felipe"},
+                {3, "Pedro"},
+            };
+            Flight fl = new(flightMaxSeats);
+            ReturnModel result;
+            foreach (var value in dataToTest)
+            {
+                result = fl.Book(value.Key, value.Value);
+                result.GetMessage().Should().Be(null);
+            }
             fl.getNumberOfSeatsRemaining().Should().Be(0);
         }
 
         [Fact]
         public void ForceOverBooking()
         {
-            Dictionary<int, string> dataToTest = new Dictionary<int, string>()
+            Dictionary<int, string> dataToTest = new()
             {
                 {1, "Marcello"},
-                {2, "Feliple"},
+                {2, "Felipe"},
                 {3, "Pedro"},
                 {4, "Lucas"},
             };
-            const int flightMaxSeats = 3;
-            Flight fl = new Flight(flightMaxSeats);
+            Flight fl = new(flightMaxSeats);
+            ReturnModel result;
             foreach (var value in dataToTest)
             {
-                ReturnModel result = fl.Book(value.Key, value.Value);
-                if (!result.GetSucess())
+                result = fl.Book(value.Key, value.Value);
+                bool sucess = result.GetSucess();
+                if (!sucess)
                 {
                     result.GetMessage().Should().Be("Over booking happening, max seats reached and a already occupied place with this seat is owned.");
-                    result.GetSucess().Should().Be(false);
+                    sucess.Should().Be(false);
                 }
             }
         }
@@ -41,16 +54,32 @@ namespace FlightTester
         [Fact]
         public void AlreadyOccupied()
         {
-            Flight fl = new Flight(3);
-            fl.Book(1, "Marcello");
-            fl.Book(1, "Marcello1");
+            string[] dataToTest = 
+            {
+                "Marcello",
+                "Felipe"
+            };
+            Flight fl = new(2);
+            ReturnModel result;
+            for (int i = 1; i <= dataToTest.Length; i++)
+            {
+                result = fl.Book(i, dataToTest[i-1]);
+                bool sucess = result.GetSucess();
+                if (!sucess) {
+                    sucess.Should().Be(false);
+                    result.GetMessage().Should().Be("This Seat is already occupied.");
+                }
+            }
         }
 
         [Fact]
         public void InvalidSeat()
         {
-            Flight fl = new Flight(3);
-            fl.Book(-1, "Marcello");
+            //Flight fl = new(1);
+            ReturnModel result =  new Flight(1).Book(-1, "Marcello");
+
+            result.GetSucess().Should().Be(false);
+            result.GetMessage().Should().Be("This Seat is a invalid position.");
         }
     }
 }

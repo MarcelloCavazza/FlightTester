@@ -58,12 +58,12 @@ namespace Domain.FlightTest
         }
         public ReturnModel IsInValidPosition(int seat)
         {
-            if (seat <= 0) return new ReturnModel(false, $"This Seat is a invalid position. \nInputed Seat Location: {seat}");
+            if (seat <= 0) return new ReturnModel(false, $"This Seat is a invalid position.");
             return new ReturnModel(true);
         }
         public ReturnModel IsAlreadyOccupiedSeat(int seat)
         {
-            if (this.seatsList.ContainsKey(seat)) return new ReturnModel(false, $"This Seat is already occupied. \nInputed Seat Location: {seat}");
+            if (this.seatsList.ContainsKey(seat)) return new ReturnModel(false, $"This Seat is already occupied.");
             return new ReturnModel(true);
         }
     }
