@@ -6,7 +6,7 @@ namespace FlightTester
 {
     public class FlightTester
     {
-        private const int flightMaxSeats = 3;
+        protected const int flightMaxSeats = 3;
 
         [Fact]
         public void SucessfulBooking()
@@ -18,12 +18,26 @@ namespace FlightTester
                 {3, "Pedro"},
             };
             Flight fl = new(flightMaxSeats);
-
+            object? error;
             foreach (var value in dataToTest)
             {
-                fl.Book(value.Key, value.Value).Should().Be(null);
+                error = fl.Book(value.Key, value.Value);
+                error.Should().BeNull();
             }
-            fl.getNumberOfSeatsRemaining().Should().Be(0);
+        }
+        [Theory]
+        [InlineData(3, new string[]{"Marcello", "Pedro", "Felipe"})]
+        [InlineData(4, new string[]{"Marcello", "Pedro", "Felipe"})]
+        public void BookingReducesNumberOfSeats(int seatMaxCapacity, string[] dataToBook)
+        {
+            Flight fl = new(seatMaxCapacity);
+            for(int i = 0; i< dataToBook.Length; i++)
+            {
+                fl.Book(i+1, dataToBook[i]);
+            }
+            int seatDiff = seatMaxCapacity - dataToBook.Count();
+            seatDiff.Should().BeGreaterThanOrEqualTo(0);
+            fl.getNumberOfSeatsRemaining().Should().Be(seatDiff);
         }
 
         [Fact]
@@ -42,10 +56,7 @@ namespace FlightTester
             {
                 object? result = fl.Book(value.Key, value.Value);
                 
-                if (result != null)
-                {
-                    result.Should().BeOfType<OverBookingError>();
-                }
+                result?.Should().BeOfType<OverBookingError>();
             }
         }
     }
