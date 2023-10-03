@@ -25,9 +25,24 @@ namespace FlightTester
                 error.Should().BeNull();
             }
         }
+
+        [Theory]
+        [InlineData(1, "Marcello", 1)]
+        [InlineData(2, "Marcos",3)]
+        [InlineData(3, "Felipe",3)]
+        public void ReallyCreatedABooking(int seatNumber, string seatName, int maxSeat)
+        {
+            Flight fl = new Flight(maxSeat);
+
+            fl.Book(seatNumber, seatName);
+
+            fl.ContainsARegistry(seatNumber, seatName).Should().BeTrue();
+        }
+
         [Theory]
         [InlineData(3, new string[]{"Marcello", "Pedro", "Felipe"})]
         [InlineData(4, new string[]{"Marcello", "Pedro", "Felipe"})]
+        [InlineData(7, new string[]{"Marcello", "Pedro", "Felipe"})]
         //[InlineData(2, new string[]{"Marcello", "Pedro", "Felipe"})] assim o teste quebra
         public void BookingReducesNumberOfSeats(int seatMaxCapacity, string[] dataToBook)
         {

@@ -12,6 +12,15 @@ namespace Domain.FlightTest
             this.seatsLength = numberOfSeats;
         }
 
+        public bool ContainsARegistry(int registryId, string userName)
+        {
+            if (seatsList.ContainsKey(registryId))
+            {
+                return seatsList[registryId] == userName;
+            }
+            return false;
+        }
+
         public int getNumberOfSeatsRemaining()
         {
             return this.seatsLength - this.seatsList.Count();
