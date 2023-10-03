@@ -28,6 +28,7 @@ namespace FlightTester
         [Theory]
         [InlineData(3, new string[]{"Marcello", "Pedro", "Felipe"})]
         [InlineData(4, new string[]{"Marcello", "Pedro", "Felipe"})]
+        //[InlineData(2, new string[]{"Marcello", "Pedro", "Felipe"})] assim o teste quebra
         public void BookingReducesNumberOfSeats(int seatMaxCapacity, string[] dataToBook)
         {
             Flight fl = new(seatMaxCapacity);
