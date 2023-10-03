@@ -18,11 +18,10 @@ namespace FlightTester
                 {3, "Pedro"},
             };
             Flight fl = new(flightMaxSeats);
-            ReturnModel result;
+
             foreach (var value in dataToTest)
             {
-                result = fl.Book(value.Key, value.Value);
-                result.GetMessage().Should().Be(null);
+                fl.Book(value.Key, value.Value).Should().Be(null);
             }
             fl.getNumberOfSeatsRemaining().Should().Be(0);
         }
@@ -38,48 +37,16 @@ namespace FlightTester
                 {4, "Lucas"},
             };
             Flight fl = new(flightMaxSeats);
-            ReturnModel result;
+
             foreach (var value in dataToTest)
             {
-                result = fl.Book(value.Key, value.Value);
-                bool sucess = result.GetSucess();
-                if (!sucess)
+                object? result = fl.Book(value.Key, value.Value);
+                
+                if (result != null)
                 {
-                    result.GetMessage().Should().Be("Over booking happening, max seats reached and a already occupied place with this seat is owned.");
-                    sucess.Should().Be(false);
+                    result.Should().BeOfType<OverBookingError>();
                 }
             }
-        }
-
-        [Fact]
-        public void AlreadyOccupied()
-        {
-            string[] dataToTest = 
-            {
-                "Marcello",
-                "Felipe"
-            };
-            Flight fl = new(2);
-            ReturnModel result;
-            for (int i = 1; i <= dataToTest.Length; i++)
-            {
-                result = fl.Book(i, dataToTest[i-1]);
-                bool sucess = result.GetSucess();
-                if (!sucess) {
-                    sucess.Should().Be(false);
-                    result.GetMessage().Should().Be("This Seat is already occupied.");
-                }
-            }
-        }
-
-        [Fact]
-        public void InvalidSeat()
-        {
-            //Flight fl = new(1);
-            ReturnModel result =  new Flight(1).Book(-1, "Marcello");
-
-            result.GetSucess().Should().Be(false);
-            result.GetMessage().Should().Be("This Seat is a invalid position.");
         }
     }
 }

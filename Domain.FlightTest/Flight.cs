@@ -17,54 +17,22 @@ namespace Domain.FlightTest
             return this.seatsLength - this.seatsList.Count();
         }
 
-        public ReturnModel Book(int seat, string name)
+        public object? Book(int seat, string name)
         {
-            ReturnModel willOverBook = WillOverBook(seat);
-            ReturnModel isValidPossibleSeat = IsValidPossibleSeat(seat);
-            if (willOverBook.GetSucess() && isValidPossibleSeat.GetSucess())
+            object? willOverBook = WillOverBook(seat);
+
+            if (willOverBook != null)
             {
-                this.seatsList.Add(seat, name);
-            }
-            else
-            {
-                if(!willOverBook.GetSucess()) return new ReturnModel(false, willOverBook.GetMessage());
-                return new ReturnModel(false, isValidPossibleSeat.GetMessage());
+                return willOverBook;
             }
 
-            return new ReturnModel(true);
+            this.seatsList.Add(seat, name);
+            return null;
         }
-        public ReturnModel WillOverBook(int seat)
+        public object? WillOverBook(int seat)
         {
-            if (this.seatsList.Count == this.seatsLength) {
-                return new ReturnModel(false, $"Over booking happening, max seats reached and a already occupied place with this seat is owned.");
-            }
-            return new ReturnModel(true);
-        }
-
-        public ReturnModel IsValidPossibleSeat(int seat)
-        {
-            ReturnModel isAlreadyOccupiedSeat = IsAlreadyOccupiedSeat(seat);
-            if (!isAlreadyOccupiedSeat.GetSucess())
-            {
-                return new ReturnModel(false, isAlreadyOccupiedSeat.GetMessage());
-            }
-            ReturnModel isInValidPosition = IsInValidPosition(seat);
-            if (!isInValidPosition.GetSucess())
-            {
-                return new ReturnModel(false, isInValidPosition.GetMessage());
-            }
-
-            return new ReturnModel(true);
-        }
-        public ReturnModel IsInValidPosition(int seat)
-        {
-            if (seat <= 0) return new ReturnModel(false, $"This Seat is a invalid position.");
-            return new ReturnModel(true);
-        }
-        public ReturnModel IsAlreadyOccupiedSeat(int seat)
-        {
-            if (this.seatsList.ContainsKey(seat)) return new ReturnModel(false, $"This Seat is already occupied.");
-            return new ReturnModel(true);
+            if (this.seatsList.Count == this.seatsLength) return new OverBookingError();
+            return null;
         }
     }
 }
