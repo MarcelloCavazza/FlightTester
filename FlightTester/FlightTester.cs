@@ -11,19 +11,9 @@ namespace FlightTester
         [Fact]
         public void SucessfulBooking()
         {
-            Dictionary<int, string> dataToTest = new()
-            {
-                {1, "Marcello"},
-                {2, "Felipe"},
-                {3, "Pedro"},
-            };
             Flight fl = new(flightMaxSeats);
-            object? error;
-            foreach (var value in dataToTest)
-            {
-                error = fl.Book(value.Key, value.Value);
-                error.Should().BeNull();
-            }
+            object? error = fl.Book(1, "Marcello");
+            error.Should().BeNull();
         }
 
         [Theory]
@@ -36,7 +26,18 @@ namespace FlightTester
 
             fl.Book(seatNumber, seatName);
 
-            fl.ContainsARegistry(seatNumber, seatName).Should().BeTrue();
+            fl.ContainsARegistry(seatNumber, seatName).Should().BeNull();
+        }
+
+        [Theory]
+        [InlineData(2, "marcello", 1)]
+        [InlineData(5, "marcos", 3)]
+        [InlineData(-1, "Felipe", 3)]
+        public void IncorrectSeatNumber(int seatNumber, string seatName, int maxSeat)
+        {
+            Flight fl = new Flight(maxSeat);
+
+            fl.Book(seatNumber, seatName).Should().BeOfType<InvalidSeatNumber>();
         }
 
         [Theory]
@@ -74,6 +75,19 @@ namespace FlightTester
                 
                 result?.Should().BeOfType<OverBookingError>();
             }
+        }
+
+        [Fact]
+        public void CancelAlreadyMadeBooking()
+        {
+            int seatNumber = 1, maxSeats = 3;
+            string userName = "Marcello";
+
+            Flight flight = new(maxSeats);
+
+            flight.Book(seatNumber, userName).Should().BeNull();
+            flight.ContainsARegistry(seatNumber, userName).Should().BeNull();
+            flight.CancelBook(seatNumber, userName).Should().BeNull();
         }
     }
 }
