@@ -7,6 +7,7 @@ namespace Domain.FlightTest
         private Dictionary<int, string> seatsList = new Dictionary<int, string>();
         private int seatsLength;
 
+        public Guid Id { get; }
         public Flight(int numberOfSeats)
         {
             this.seatsLength = numberOfSeats;

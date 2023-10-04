@@ -1,3 +1,5 @@
+using Data;
+using Domain.FlightTest;
 using FluentAssertions;
 
 namespace Application.Test
@@ -9,9 +11,12 @@ namespace Application.Test
         {
             const string passagensEmail = "marcello@gmail.com";
             const int numberOfSeats = 10;
-            BookingService bookingService = new();
-            bookingService.Book(new BookDTO(Guid.NewGuid(), passagensEmail, numberOfSeats));
-            bookingService.FindBookings().Should().ContainEquivalentOf(
+            Entities entities = new ();
+            Flight flight = new(3);
+            entities.Flights.Add(flight);
+            BookingService bookingService = new(entities);
+            bookingService.Book(new BookDTO(flight.Id, passagensEmail, numberOfSeats));
+            bookingService.FindBookings(flight.Id).Should().ContainEquivalentOf(
                 new BookingRM(passagensEmail, numberOfSeats)
                 );
         }
@@ -22,12 +27,16 @@ namespace Application.Test
 
     public class BookingService
     {
+        public BookingService(Entities entities)
+        {
+            
+        }
         public void Book(BookDTO data)
         {
 
         }
 
-        public IEnumerable<BookingRM> FindBookings()
+        public IEnumerable<BookingRM> FindBookings(Guid flightId)
         {
             return new[]
             {
@@ -59,4 +68,5 @@ namespace Application.Test
             this.PassengerEmail = passengerEmail;
         }
     }
+
 }
