@@ -20,12 +20,11 @@ namespace FlightTester
         [InlineData(1, "Marcello", 1)]
         [InlineData(2, "Marcos",3)]
         [InlineData(3, "Felipe",3)]
-        public void ReallyCreatedABooking(int seatNumber, string seatName, int maxSeat)
+        public void VerifyIfBookWasCreated(int seatNumber, string seatName, int maxSeat)
         {
-            Flight fl = new Flight(maxSeat);
+            Flight fl = new (maxSeat);
 
-            fl.Book(seatNumber, seatName);
-
+            fl.Book(seatNumber, seatName).Should().BeNull();
             fl.ContainsARegistry(seatNumber, seatName).Should().BeNull();
         }
 
@@ -35,7 +34,7 @@ namespace FlightTester
         [InlineData(-1, "Felipe", 3)]
         public void IncorrectSeatNumber(int seatNumber, string seatName, int maxSeat)
         {
-            Flight fl = new Flight(maxSeat);
+            Flight fl = new (maxSeat);
 
             fl.Book(seatNumber, seatName).Should().BeOfType<InvalidSeatNumber>();
         }
@@ -44,7 +43,6 @@ namespace FlightTester
         [InlineData(3, new string[]{"Marcello", "Pedro", "Felipe"})]
         [InlineData(4, new string[]{"Marcello", "Pedro", "Felipe"})]
         [InlineData(7, new string[]{"Marcello", "Pedro", "Felipe"})]
-        //[InlineData(2, new string[]{"Marcello", "Pedro", "Felipe"})] assim o teste quebra
         public void BookingReducesNumberOfSeats(int seatMaxCapacity, string[] dataToBook)
         {
             Flight fl = new(seatMaxCapacity);
@@ -82,12 +80,11 @@ namespace FlightTester
         {
             int seatNumber = 1, maxSeats = 3;
             string userName = "Marcello";
-
             Flight flight = new(maxSeats);
 
             flight.Book(seatNumber, userName).Should().BeNull();
-            flight.ContainsARegistry(seatNumber, userName).Should().BeNull();
             flight.CancelBook(seatNumber, userName).Should().BeNull();
+            flight.getNumberOfSeatsRemaining().Should().Be(maxSeats);
         }
     }
 }
