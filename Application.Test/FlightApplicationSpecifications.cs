@@ -1,6 +1,8 @@
 using Data;
 using Domain.FlightTest;
 using FluentAssertions;
+using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Test
 {
@@ -11,7 +13,7 @@ namespace Application.Test
         {
             const string passagensEmail = "marcello@gmail.com";
             const int numberOfSeats = 10;
-            Entities entities = new ();
+            Entities entities = new Entities(new DbContextOptionsBuilder<Entities>().UseInMemoryDatabase("Flights").Options);
             Flight flight = new(3);
             entities.Flights.Add(flight);
             BookingService bookingService = new(entities);
@@ -40,7 +42,7 @@ namespace Application.Test
         {
             return new[]
             {
-                new BookingRM("asdfa", 23)
+                new BookingRM("marcello@gmail.com", 10)
             };
         }
     }

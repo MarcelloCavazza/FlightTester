@@ -1,13 +1,21 @@
-﻿using System.Runtime.Serialization;
+﻿using Microsoft.Win32;
+using System.Runtime.Serialization;
 
 namespace Domain.FlightTest
 {
     public class Flight
     {
-        private Dictionary<int, string> seatsList = new Dictionary<int, string>();
+        public List<Booking> seatsList { get; set; } = new List<Booking>();
         private int seatsLength;
 
         public Guid Id { get; }
+
+        [Obsolete("Needed by EF")]
+        public Flight()
+        {
+           
+        }
+
         public Flight(int numberOfSeats)
         {
             this.seatsLength = numberOfSeats;
@@ -21,7 +29,7 @@ namespace Domain.FlightTest
             
             if(isValidSeatNumber != null) return isValidSeatNumber;
 
-            this.seatsList.Add(seat, name);
+            this.seatsList.Add(new Booking(seat, name));
             return null;
         }
         public int getNumberOfSeatsRemaining()
@@ -35,25 +43,13 @@ namespace Domain.FlightTest
         }
         public object? ContainsARegistry(int registryId, string userName = "")
         {
-            bool userNameNull = true;
-            if (!string.IsNullOrEmpty(userName))
+
+            var result = this.seatsList.FirstOrDefault(x => x.Id == registryId);
+            if (result != null)
             {
-                userNameNull = false;
+                return null;
             }
-            if (userNameNull)
-            {
-                if (this.seatsList.ContainsKey(registryId))
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                if (this.seatsList.ContainsKey(registryId) && this.seatsList[registryId] == userName)
-                {
-                    return null;
-                }
-            }
+            
             
             return new SeatNotFound();
         }
@@ -62,7 +58,10 @@ namespace Domain.FlightTest
             object? containsRegistry = ContainsARegistry(seatNumber, userName);
             if (containsRegistry == null)
             {
-                this.seatsList.Remove(seatNumber);
+                var result = this.seatsList.FirstOrDefault(x => x.Id == seatNumber);
+                Console.WriteLine(result);
+                //if(result == -1) return new InvalidSeatNumber();
+                this.seatsList.Remove(result);
                 return null;
             }
 
