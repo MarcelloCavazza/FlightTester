@@ -8,18 +8,18 @@ namespace Application.Test
 {
     public class FlightApplicationSpecifications
     {
-        [Fact]
-        public void Books_Flights()
+        [Theory]
+        [InlineData("a@b.gmail", 2)]
+        [InlineData("a@c.gmail", 5)]
+        public void Books_Flights(string passengerEmail, int numberOfSeats)
         {
-            const string passagensEmail = "marcello@gmail.com";
-            const int numberOfSeats = 10;
             Entities entities = new Entities(new DbContextOptionsBuilder<Entities>().UseInMemoryDatabase("Flights").Options);
             Flight flight = new(3);
             entities.Flights.Add(flight);
             BookingService bookingService = new(entities);
-            bookingService.Book(new BookDTO(flight.Id, passagensEmail, numberOfSeats));
+            bookingService.Book(new BookDTO(flight.Id, passengerEmail, numberOfSeats));
             bookingService.FindBookings(flight.Id).Should().ContainEquivalentOf(
-                new BookingRM(passagensEmail, numberOfSeats)
+                new BookingRM(passengerEmail, numberOfSeats)
                 );
         }
 
@@ -29,13 +29,14 @@ namespace Application.Test
 
     public class BookingService
     {
+        private Entities Entities { get; set; }
         public BookingService(Entities entities)
         {
             
         }
         public void Book(BookDTO data)
         {
-
+            var flight = Entities.Flights.Find(data.GetFlightId());
         }
 
         public IEnumerable<BookingRM> FindBookings(Guid flightId)
@@ -52,6 +53,11 @@ namespace Application.Test
         private string PassengerEmail { get; set; }
         private int NumberOfSeats { get; set; }
         private Guid FlightId { get; set; }
+
+        public Guid GetFlightId()
+        {
+            return this.FlightId;
+        }
         public BookDTO(Guid flightId, string passangerEmail, int numberOfSeats)
         {
             this.NumberOfSeats = numberOfSeats;
