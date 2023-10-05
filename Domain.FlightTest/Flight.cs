@@ -7,7 +7,7 @@ namespace Domain.FlightTest
     {
         public List<Booking> seatsList { get; private set; }
         public IEnumerable<Booking> SeatsList => seatsList;
-        private int seatsLength;
+        public int seatsLength;
 
         public Guid Id { get; }
 

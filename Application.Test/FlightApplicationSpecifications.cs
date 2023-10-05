@@ -12,13 +12,14 @@ namespace Application.Test
         [Theory]
         [InlineData("a@b.gmail", 2)]
         [InlineData("a@c.gmail", 3)]
+        [InlineData("x@c.gmail", 2)]
         public void Books_Flights(string passengerEmail, int numberOfSeats)
         {
             Entities entities = new Entities(new DbContextOptionsBuilder<Entities>().UseInMemoryDatabase("Flights").Options);
             Flight flight = new Flight(3);
             entities.Flights.Add(flight);
             BookingService bookingService = new BookingService(entities);
-            bookingService.Book(new BookDTO(flight.Id, passengerEmail, numberOfSeats));
+            bookingService.Book(new BookDTO(flight.Id, passengerEmail, numberOfSeats)).Should().BeNull();
             bookingService.FindBookings(flight.Id).Should().ContainEquivalentOf(
                 new Booking(flight.Id, passengerEmail, numberOfSeats)
                 );
@@ -35,11 +36,12 @@ namespace Application.Test
         {
             Entities = entities;
         }
-        public void Book(BookDTO data)
+        public object? Book(BookDTO data)
         {
             var flight = this.Entities.Flights.Find(data.GetFlightId());
-            flight.Book(data.GetFlightId(), data.GetNumberOfSeats(), data.GetPassengerEmail());
+            object? result = flight.Book(data.GetFlightId(), data.GetNumberOfSeats(), data.GetPassengerEmail());
             this.Entities.SaveChanges();
+            return result;
         }
 
         public IEnumerable<BookingRM> FindBookings(Guid flightId)
