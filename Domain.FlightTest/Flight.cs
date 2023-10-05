@@ -21,15 +21,15 @@ namespace Domain.FlightTest
             this.seatsLength = numberOfSeats;
         }    
 
-        public object? Book(int seat, string name)
+        public object? Book(Guid regystryId, int seatNumber, string name)
         {
-            object? willOverBook = WillOverBook(), isValidSeatNumber = IsValidSeatNumber(seat);
+            object? willOverBook = WillOverBook(), isValidSeatNumber = IsValidSeatNumber(seatNumber, regystryId);
 
             if (willOverBook != null) return willOverBook;
             
             if(isValidSeatNumber != null) return isValidSeatNumber;
 
-            this.seatsList.Add(new Booking(seat, name));
+            this.seatsList.Add(new Booking(regystryId, name, seatNumber));
             return null;
         }
         public int getNumberOfSeatsRemaining()
@@ -41,10 +41,10 @@ namespace Domain.FlightTest
             if (this.seatsList.Count == this.seatsLength) return new OverBookingError();
             return null;
         }
-        public object? ContainsARegistry(int registryId, string userName = "")
+        public object? ContainsARegistry(Guid registryId, string userName = "")
         {
 
-            var result = this.seatsList.FirstOrDefault(x => x.Id == registryId);
+            var result = this.seatsList.FirstOrDefault(x => x.GetId()'' == registryId);
             if (result != null)
             {
                 return null;
@@ -53,14 +53,13 @@ namespace Domain.FlightTest
             
             return new SeatNotFound();
         }
-        public object? CancelBook(int seatNumber,  string userName)
+        public object? CancelBook(Guid seatNumber,  string userName)
         {
             object? containsRegistry = ContainsARegistry(seatNumber, userName);
             if (containsRegistry == null)
             {
-                var result = this.seatsList.FirstOrDefault(x => x.Id == seatNumber);
+                var result = this.seatsList.FirstOrDefault(x => x.GetId() == seatNumber);
                 Console.WriteLine(result);
-                //if(result == -1) return new InvalidSeatNumber();
                 this.seatsList.Remove(result);
                 return null;
             }
@@ -68,9 +67,9 @@ namespace Domain.FlightTest
             return containsRegistry;
         }
 
-        public object? IsValidSeatNumber(int seatNumber)
+        public object? IsValidSeatNumber(int seatNumber, Guid id)
         {
-            object? containsRegistry = ContainsARegistry(seatNumber);
+            object? containsRegistry = ContainsARegistry(id);
             if (containsRegistry == null) return new AlreadyExistsASeatRegistry();
             if (seatNumber <= 0 || seatNumber > this.seatsLength) return new InvalidSeatNumber();
 

@@ -12,7 +12,7 @@ namespace FlightTester
         public void SucessfulBooking()
         {
             Flight fl = new(flightMaxSeats);
-            object? error = fl.Book(1, "Marcello");
+            object? error = fl.Book(Guid.NewGuid(), 1, "Marcello");
             error.Should().BeNull();
         }
 
@@ -23,9 +23,9 @@ namespace FlightTester
         public void VerifyIfBookWasCreated(int seatNumber, string seatName, int maxSeat)
         {
             Flight fl = new (maxSeat);
-
-            fl.Book(seatNumber, seatName).Should().BeNull();
-            fl.ContainsARegistry(seatNumber, seatName).Should().BeNull();
+            Guid seatId = Guid.NewGuid();
+            fl.Book(seatId, seatNumber, seatName).Should().BeNull();
+            fl.ContainsARegistry(seatId, seatName).Should().BeNull();
         }
 
         [Theory]
@@ -35,8 +35,8 @@ namespace FlightTester
         public void IncorrectSeatNumber(int seatNumber, string seatName, int maxSeat)
         {
             Flight fl = new (maxSeat);
-
-            fl.Book(seatNumber, seatName).Should().BeOfType<InvalidSeatNumber>();
+            Guid id = Guid.NewGuid();
+            fl.Book(id, seatNumber, seatName).Should().BeOfType<InvalidSeatNumber>();
         }
 
         [Theory]
@@ -48,7 +48,7 @@ namespace FlightTester
             Flight fl = new(seatMaxCapacity);
             for(int i = 0; i< dataToBook.Length; i++)
             {
-                fl.Book(i+1, dataToBook[i]);
+                fl.Book(Guid.NewGuid(), i+1, dataToBook[i]);
             }
             int seatDiff = seatMaxCapacity - dataToBook.Count();
             seatDiff.Should().BeGreaterThanOrEqualTo(0);
@@ -69,7 +69,7 @@ namespace FlightTester
 
             foreach (var value in dataToTest)
             {
-                object? result = fl.Book(value.Key, value.Value);
+                object? result = fl.Book(Guid.NewGuid(), value.Key, value.Value);
                 
                 result?.Should().BeOfType<OverBookingError>();
             }
@@ -81,9 +81,9 @@ namespace FlightTester
             int seatNumber = 1, maxSeats = 3;
             string userName = "Marcello";
             Flight flight = new(maxSeats);
-
-            flight.Book(seatNumber, userName).Should().BeNull();
-            flight.CancelBook(seatNumber, userName).Should().BeNull();
+            Guid id = Guid.NewGuid();
+            flight.Book(id, seatNumber, userName).Should().BeNull();
+            flight.CancelBook(id, userName).Should().BeNull();
             flight.getNumberOfSeatsRemaining().Should().Be(maxSeats);
         }
     }
