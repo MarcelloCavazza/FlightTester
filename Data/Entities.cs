@@ -16,7 +16,8 @@ namespace Data
         {
             modelBuilder.Entity<Flight>().HasKey(f => f.Id);
 
-            modelBuilder.Entity<Flight>().OwnsMany(f => f.seatsList);
+            modelBuilder.Entity<Flight>().HasMany(f => f.SeatsList).WithOne().IsRequired();
+            modelBuilder.Entity<Booking>().HasKey(f => f.Id);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -5,21 +5,29 @@ namespace Domain.FlightTest
 {
     public class Flight
     {
-        public List<Booking> seatsList { get; set; } = new List<Booking>();
+        public List<Booking> seatsList { get; private set; }
+        public IEnumerable<Booking> SeatsList => seatsList;
         private int seatsLength;
 
         public Guid Id { get; }
 
         [Obsolete("Needed by EF")]
-        public Flight()
+        Flight()
         {
            
         }
-
         public Flight(int numberOfSeats)
         {
+            this.seatsList = new List<Booking>();
             this.seatsLength = numberOfSeats;
-        }    
+            this.Id = Guid.NewGuid();
+        }
+
+
+        public List<Booking> GetSeatsList()
+        {
+            return this.seatsList;
+        }
 
         public object? Book(Guid regystryId, int seatNumber, string name)
         {
@@ -44,7 +52,7 @@ namespace Domain.FlightTest
         public object? ContainsARegistry(Guid registryId, string userName = "")
         {
 
-            var result = this.seatsList.FirstOrDefault(x => x.GetId()'' == registryId);
+            var result = this.seatsList.FirstOrDefault(x => x.Id == registryId);
             if (result != null)
             {
                 return null;
@@ -58,7 +66,7 @@ namespace Domain.FlightTest
             object? containsRegistry = ContainsARegistry(seatNumber, userName);
             if (containsRegistry == null)
             {
-                var result = this.seatsList.FirstOrDefault(x => x.GetId() == seatNumber);
+                var result = this.SeatsList.FirstOrDefault(x => x.Id == seatNumber);
                 Console.WriteLine(result);
                 this.seatsList.Remove(result);
                 return null;

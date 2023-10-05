@@ -16,11 +16,11 @@ namespace Application.Test
         {
             Guid Id = Guid.NewGuid();
             Entities entities = new Entities(new DbContextOptionsBuilder<Entities>().UseInMemoryDatabase("Flights").Options);
-            Flight flight = new(3);
+            Flight flight = new Flight(3);
             entities.Flights.Add(flight);
-            BookingService bookingService = new(entities);
-            bookingService.Book(new BookDTO(Id, passengerEmail, numberOfSeats));
-            bookingService.FindBookings(Id).Should().ContainEquivalentOf(
+            BookingService bookingService = new BookingService(entities);
+            bookingService.Book(new BookDTO(flight.Id, passengerEmail, numberOfSeats));
+            bookingService.FindBookings(flight.Id).Should().ContainEquivalentOf(
                 new BookingRM(passengerEmail, numberOfSeats, Id)
                 );
         }
@@ -34,22 +34,24 @@ namespace Application.Test
         private Entities Entities { get; set; }
         public BookingService(Entities entities)
         {
-            
+            Entities = entities;
         }
         public void Book(BookDTO data)
         {
-            var flight = Entities.Flights.Find(data.GetFlightId());
+            var flight = this.Entities.Flights.Find(data.GetFlightId());
             flight.Book(data.GetFlightId(), data.GetNumberOfSeats(), data.GetPassengerEmail());
-            Entities.SaveChanges();
+            this.Entities.SaveChanges();
         }
 
-        public IEnumerable<BookingRM> FindBookings(Guid flightId)
+        public IEnumerable<Booking> FindBookings(Guid flightId)
         {
-            return Entities.Flights.Find(flightId).seatsList.Select(x => new BookingRM(
+            var temp = this.Entities.Flights.Find(flightId).GetSeatsList();
+            var temp2 = temp.Select(x => new Booking(
+                    x.Id,
                     x.GetPassengerEmail(),
-                    x.GetSeatNumber(),
-                    x.GetId()
+                    x.GetSeatNumber()
                 ));
+            return temp2;
         }
     }
 

@@ -8,22 +8,21 @@ namespace Domain.FlightTest
 {
     public class Booking
     {
-        private Guid Id { get; set; }
-        private int seatNumber { get; set; }
+        public Guid Id { get; private set; }
+        private int SeatNumber { get; set; }
         private string PassengerEmail { get; set; }
-        public Booking(Guid id, string passengerEmail, int SeatNumber)
+        public Booking()
+        {
+        }
+        public Booking(Guid id, string passengerEmail, int seatNumber)
         {
             this.Id = id;
-            this.seatNumber = SeatNumber;
+            this.SeatNumber = seatNumber;
             this.PassengerEmail = passengerEmail;    
-        }
-        public Guid GetId()
-        {
-            return this.Id;
         }
         public int GetSeatNumber()
         {
-            return this.seatNumber;
+            return this.SeatNumber;
         }
         public string GetPassengerEmail()
         {
