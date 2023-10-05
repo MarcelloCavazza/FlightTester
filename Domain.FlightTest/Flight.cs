@@ -44,7 +44,7 @@ namespace Domain.FlightTest
         public object? ContainsARegistry(Guid registryId, string userName = "")
         {
 
-            var result = this.seatsList.FirstOrDefault(x => x.GetId()'' == registryId);
+            var result = this.seatsList.FirstOrDefault(x => x.GetId() == registryId);
             if (result != null)
             {
                 return null;
